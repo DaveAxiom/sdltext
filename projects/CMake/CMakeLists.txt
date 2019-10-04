@@ -7,9 +7,9 @@ MESSAGE( STATUS "CMAKE_CXX_COMPILER_ID: " ${CMAKE_CXX_COMPILER_ID} )
 FIND_PACKAGE(Threads)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    list( APPEND CMAKE_CXX_FLAGS " -std=c++1y -ftemplate-depth=1024 ${CMAKE_CXX_FLAGS}")
+    list( APPEND CMAKE_CXX_FLAGS " -std=c++17 -ftemplate-depth=1024 ${CMAKE_CXX_FLAGS}")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    list( APPEND CMAKE_CXX_FLAGS " -std=c++1y ${CMAKE_CXX_FLAGS}")
+    list( APPEND CMAKE_CXX_FLAGS " -std=c++17 ${CMAKE_CXX_FLAGS}")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     list( APPEND CMAKE_CXX_FLAGS " /DUNICODE /D_UNICODE /bigobj ${CMAKE_CXX_FLAGS}")
 endif()
@@ -48,7 +48,13 @@ set(SDLTEXT_SOURCES
 )
 
 add_executable(circle ${SDLTEXT_SOURCES})
-TARGET_LINK_LIBRARIES(circle ${CMAKE_THREAD_LIBS_INIT} ${SDL_LIBRARY} ${SDL_TTF_LIBRARY})
+
+# GCC versions 5.3 through 8.x need stdc++fs for std::filesystem
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    TARGET_LINK_LIBRARIES(circle ${CMAKE_THREAD_LIBS_INIT} ${SDL_LIBRARY} ${SDL_TTF_LIBRARY} stdc++fs)
+else()
+    TARGET_LINK_LIBRARIES(circle ${CMAKE_THREAD_LIBS_INIT} ${SDL_LIBRARY} ${SDL_TTF_LIBRARY})
+endif()
 
 # configure unit tests via CTest
 enable_testing()

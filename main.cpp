@@ -109,10 +109,21 @@ const SDL_Color white = { 255, 255, 255, 255 };
 * @return observable<int>
 */
 const auto application = [](SDL_Renderer *renderer, rx::observable<SDL_Event*> events, rx::observable<t::milliseconds> updates, rx::observable<SDL_Renderer *> renders) {
+    std::vector<std::filesystem::path>font_path_vector = 
+        {std::filesystem::path("/Library/Fonts/Arial.ttf"), 
+        std::filesystem::path("/usr/share/fonts/truetype/freefont/FreeSans.ttf")};
+    std::filesystem::path font_file;
+    for (auto file_path_iter : font_path_vector)
+    {
+        if (std::filesystem::exists(file_path_iter) == true)
+        {
+            font_file = file_path_iter;
+            break;
+        }
+    }
 
-    auto arrow = draw_text(renderer, "/Library/Fonts/Arial.ttf", 36, "Time flies like an arrow", white);
-
-    auto dreadpirate = draw_text(renderer, "/Library/Fonts/Arial.ttf", 26, "Get used to disappointment", white);
+    auto arrow = draw_text(renderer, font_file.c_str(), 36, "Time flies like an arrow", white);
+    auto dreadpirate = draw_text(renderer, font_file.c_str(), 26, "Get used to disappointment", white);
 
     return texture_circling_mouse(arrow, 1.0, 50, events, updates, renders).
         merge(texture_circling_mouse(dreadpirate, 2.0, 100, events, updates, renders));
